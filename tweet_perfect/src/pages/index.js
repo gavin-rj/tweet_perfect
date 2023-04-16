@@ -1,9 +1,11 @@
+import { useState, useEffect, useContext } from 'react';
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import Form from '../components/Form'
 import TweetOutput from '../components/TweetOutput'
+import GptTest from '../components/GptTest'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,6 +34,9 @@ export default function Home() {
               <h3 className='text-center'>Generated Tweets</h3>
               <TweetOutput/>
             </div>
+          </div>
+          <div>
+            <GptTest/>
           </div>
        </div>
       </main>
