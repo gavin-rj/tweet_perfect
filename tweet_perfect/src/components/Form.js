@@ -1,9 +1,37 @@
 // src/components/Header.js
-import React from 'react';
+import React, {useContext, useState} from 'react';
+import GptResponseContext from '../contexts/GptResponseContext';
+
 
 const Form = () => {
+
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+
+  const { setGptResponse1, setGptResponse2, setGptResponse3 } = useContext(GptResponseContext);
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const result = await fetch('/api/gpt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    const data = await result.json();
+    const responses = data.response;
+    setGptResponse1(responses[0]?.text || '');
+    setGptResponse2(responses[1]?.text || '');
+    setGptResponse3(responses[2]?.text || '');
+;
+
+  }
+  
+
   return (
-    <form className="form-group bg-light p-3 rounded">
+    <form className="form-group bg-light p-3 rounded" onSubmit={handleSubmit}> 
     <div className="mb-3">
       <label htmlFor="whitepaper" className="form-label">
         Whitepaper
@@ -13,6 +41,9 @@ const Form = () => {
         id="whitepaper"
         placeholder="Enter whitepaper"
         rows='3'
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+
       />
     </div>
     <div className="mb-3">
@@ -24,6 +55,7 @@ const Form = () => {
         id="tweetExamples"
         placeholder="Enter tweet examples"
         rows='3'
+
       />
     </div>
     <div className="mb-3">
