@@ -8,7 +8,7 @@ import TweetOutput from '../components/TweetOutput'
 import GptTest from '../components/GptTest'
 
 const inter = Inter({ subsets: ['latin'] })
-
+//home page
 export default function Home() {
   return (
     <>
