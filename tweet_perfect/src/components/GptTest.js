@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import GptResponseContext from '../contexts/GptResponseContext';
 
 const GptTest = () => {
   const [prompt, setPrompt] = useState('');
   const [response, setResponse] = useState('');
+
+  const { setGptResponse1, setGptResponse2, setGptResponse3 } = useContext(GptResponseContext);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,7 +18,16 @@ const GptTest = () => {
     });
 
     const data = await result.json();
-    setResponse(data.response);
+    const responses = data.response;
+
+    console.log('text')
+console.log(data.response)
+    setResponse(responses[0]?.text || '');
+    setGptResponse1(responses[0]?.text || '');
+    setGptResponse2(responses[1]?.text || '');
+    setGptResponse3(responses[2]?.text || '');
+;
+
   };
 
   return (

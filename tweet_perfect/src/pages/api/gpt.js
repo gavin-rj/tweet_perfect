@@ -13,11 +13,11 @@ const fetchGPTResponse = async (prompt) => {
     'model': 'text-davinci-003',
     'prompt': prompt,
     'max_tokens': 1000, 
-    'n': 1,
+    'n': 3,
     'temperature': 0.7,
   })
-  console.log(gptResponse.data)
-    return gptResponse.data.choices[0].text;
+    console.log(gptResponse.data.choices)
+    return gptResponse.data.choices;
 }
 
 export default async (req, res) => {
