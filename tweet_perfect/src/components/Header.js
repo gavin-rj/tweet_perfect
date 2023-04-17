@@ -1,6 +1,7 @@
 // src/components/Header.js
 import React from 'react';
 import Link from 'next/link';
+import LoginButton from './LoginButton.js'
 
 const Header = () => {
   return (
@@ -26,6 +27,9 @@ const Header = () => {
                 <Link href="/contact" passHref>
                   <p className="nav-link">Contact</p>
                 </Link>
+              </li>
+              <li className="nav-item">
+                <p className="nav-link"><LoginButton/></p>
               </li>
             </ul>
           </div>
