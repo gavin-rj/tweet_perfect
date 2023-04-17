@@ -12,7 +12,7 @@ export default function Component() {
   }
   return (
     <>
-      <div onClick={() => signIn()}>Sign in</div>
+      <span className ="btn btn-outline-success" onClick={() => signIn()}>Sign in</span>
     </>
   )
 }
