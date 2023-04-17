@@ -6,7 +6,7 @@ import LoginButton from './LoginButton.js'
 const Header = () => {
   return (
     <header>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <nav className="navbar navbar-expand-lg navbar-light bg-primary">
         <div className="container">
           <Link href="/" passHref>
             <p className="navbar-brand">Tweet Perfect</p>
@@ -29,7 +29,7 @@ const Header = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <p className="nav-link"><LoginButton/></p>
+                <span className="nav-link"><LoginButton/></span>
               </li>
             </ul>
           </div>
