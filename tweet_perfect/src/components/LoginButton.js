@@ -1,12 +1,11 @@
-  import { useSession, signIn, signOut } from "next-auth/react"
+import { useSession, signIn, signOut } from "next-auth/react"
+import { useEffect } from 'react';
 
   export default function Component() {
     const { data: session, status } = useSession()
-    console.log("------");
-    console.log(session);
-    console.log("------");
-    console.log(status)
-    console.log("------");
+    useEffect(() => {
+      console.log('Session in useEffect:', session);
+    }, [session]);
     if (session) {
       return (
         <>
