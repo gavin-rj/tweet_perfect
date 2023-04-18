@@ -29,25 +29,37 @@ export const authOptions = {
               email: { label: "Email", type: "email", placeholder: "email@example.com" },
               password: { label: "Password", type: "password" },
             },
+            
             authorize: async (credentials) => {
-              // Add logic here to look up the user from the credentials supplied
-              const user = await prisma.user.findUnique({
-                where: {
-                  email: credentials.email,
-                },
-              });
-      
-              if (user && (await bcrypt.compare(credentials.password, user.password))) {
-                // Any object returned will be saved in `user` property of the JWT
-                return Promise.resolve({ id: user.id, email: user.email });
-              } else {
-                // If you return null or false then the credentials will be rejected
-                return Promise.resolve(null);
-              }
-            },
-          }),
+                // Add logic here to look up the user from the credentials supplied
+                const user = await prisma.user.findUnique({
+                    where: {
+                        email: credentials.email,
+                    },
+                });
+                
+                if (user && (await bcrypt.compare(credentials.password, user.password))) {
+                    console.log("test")
+                    console.log({ id: user.id, name: user.name, email: user.email, image: user.image })
+                    // Any object returned will be saved in `user` property of the JWT
+                    return { id: user.id, name: user.name, email: user.email, image: user.image };
 
-  ],
+                } else {
+                    // If you return null or false then the credentials will be rejected
+                    return null;
+                }
+            },
+        }),
+    ],
+
+  callbacks: {
+    async session(session, user) {
+        console.log("got here")
+        session.user = user;
+        return session;
+    },
+  },  
+
 }
 
 export default NextAuth(authOptions);
