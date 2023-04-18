@@ -20,7 +20,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
       <Header/>
       <GptResponseContext.Provider value={{ gptResponse1, setGptResponse1, gptResponse2, setGptResponse2, gptResponse3, setGptResponse3 }}>
         <Component {...pageProps} />
-      </GptResponseContext.Provider>*/
+      </GptResponseContext.Provider>
     </div>
     </SessionProvider>
   )
