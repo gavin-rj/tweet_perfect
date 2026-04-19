@@ -7,7 +7,7 @@ import Card from '@/components/ui/Card'
 
 export default function SignIn() {
   const router = useRouter()
-  const { callbackUrl = '/' } = router.query
+  const callbackUrl = router.query.callbackUrl || '/'
 
   return (
     <>
@@ -34,7 +34,7 @@ export default function SignIn() {
           <Card className="space-y-6">
             {/* GitHub Sign In */}
             <button
-              onClick={() => signIn('github', { callbackUrl: callbackUrl as string })}
+              onClick={() => signIn('github', { callbackUrl })}
               className="w-full px-4 py-3 bg-secondary-900 dark:bg-white text-white dark:text-secondary-900 rounded-lg font-medium hover:bg-secondary-800 dark:hover:bg-secondary-100 transition-colors flex items-center justify-center space-x-2"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -45,7 +45,7 @@ export default function SignIn() {
 
             {/* Google Sign In */}
             <button
-              onClick={() => signIn('google', { callbackUrl: callbackUrl as string })}
+              onClick={() => signIn('google', { callbackUrl })}
               className="w-full px-4 py-3 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white border border-secondary-300 dark:border-secondary-600 rounded-lg font-medium hover:bg-secondary-50 dark:hover:bg-secondary-600 transition-colors flex items-center justify-center space-x-2"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -87,3 +87,4 @@ export default function SignIn() {
     </>
   )
 }
+

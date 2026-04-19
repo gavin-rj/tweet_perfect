@@ -1,5 +1,4 @@
 import Card from '@/components/ui/Card'
-import { formatDistanceToNow } from 'date-fns'
 
 export default function TweetHistory({ tweets }) {
   if (!tweets || tweets.length === 0) {
@@ -42,3 +41,4 @@ export default function TweetHistory({ tweets }) {
     </Card>
   )
 }
+
