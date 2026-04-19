@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Head from 'next/head'
+import { Analytics } from '@vercel/analytics/react'
 import Header from '../components/Header'
 import GptResponseContext from '../contexts/GptResponseContext'
 import { UserSettingsProvider } from '../contexts/UserSettingsContext'
@@ -13,17 +15,25 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
   const [gptResponse3, setGptResponse3] = useState(null)
 
   return (
-    <SessionProvider session={pageProps.session}>
-      <UserSettingsProvider>
-        <div>
-          <Header />
-          <GptResponseContext.Provider value={{ gptResponse1, setGptResponse1, gptResponse2, setGptResponse2, gptResponse3, setGptResponse3 }}>
-            <Component {...pageProps} />
-          </GptResponseContext.Provider>
-        </div>
-      </UserSettingsProvider>
-    </SessionProvider>
+    <>
+      <Head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <SessionProvider session={pageProps.session}>
+        <UserSettingsProvider>
+          <div>
+            <Header />
+            <GptResponseContext.Provider value={{ gptResponse1, setGptResponse1, gptResponse2, setGptResponse2, gptResponse3, setGptResponse3 }}>
+              <Component {...pageProps} />
+            </GptResponseContext.Provider>
+          </div>
+        </UserSettingsProvider>
+      </SessionProvider>
+      <Analytics />
+    </>
   )
 }
+
 
 
