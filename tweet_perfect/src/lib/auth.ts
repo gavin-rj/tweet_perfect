@@ -1,37 +1,100 @@
 import { getServerSession } from 'next-auth/next'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import type { NextAuthOptions } from 'next-auth'
-import GithubProvider from 'next-auth/providers/github'
-import GoogleProvider from 'next-auth/providers/google'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import prisma from './prisma'
+
+/**
+ * Hardcoded admin user for development
+ * In production, query from database and use proper password hashing (bcrypt)
+ */
+const DEMO_USER = {
+  id: '1',
+  email: 'admin@tweetperfect.local',
+  name: 'Admin User',
+  role: 'admin',
+}
+
+const DEMO_CREDENTIALS = {
+  username: 'admin',
+  password: '1234',
+}
 
 /**
  * NextAuth configuration options
  */
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID || '',
-      clientSecret: process.env.GITHUB_SECRET || '',
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        username: {
+          label: 'Username',
+          type: 'text',
+          placeholder: 'admin',
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+        },
+      },
+      async authorize(credentials) {
+        // Validate credentials exist
+        if (!credentials?.username || !credentials?.password) {
+          return null
+        }
+
+        // DEVELOPMENT ONLY - Hardcoded user
+        // In production, validate against database with hashed passwords
+        if (
+          credentials.username === DEMO_CREDENTIALS.username &&
+          credentials.password === DEMO_CREDENTIALS.password
+        ) {
+          return {
+            id: DEMO_USER.id,
+            email: DEMO_USER.email,
+            name: DEMO_USER.name,
+            image: null,
+          }
+        }
+
+        // Invalid credentials
+        return null
+      },
     }),
   ],
-  callbacks: {
-    async session({ session, user }: any) {
-      if (session.user) {
-        session.user.id = user.id
-      }
-      return session
-    },
-  },
+
   pages: {
     signIn: '/auth/signin',
     error: '/auth/error',
+  },
+
+  secret: process.env.NEXTAUTH_SECRET,
+
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Refresh daily
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      // Persist user ID to token when signing in
+      if (user) {
+        token.id = user.id
+        token.role = (user as any).role || 'user'
+      }
+      return token
+    },
+
+    async session({ session, token }) {
+      // Add custom fields to session
+      if (session.user) {
+        session.user.id = token.id as string
+        ;(session.user as any).role = token.role
+      }
+      return session
+    },
   },
 }
 
@@ -62,5 +125,4 @@ export async function requireAuth(
 
   return session
 }
-
 
