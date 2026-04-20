@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import GptResponseContext from '../contexts/GptResponseContext'
+import GptResponseContext from '@/contexts/GptResponseContext'
+import { PLATFORM_OPTIONS } from '@/constants/platforms'
 import Input from './ui/Input'
 import Button from './ui/Button'
 
@@ -115,10 +116,11 @@ const Form = () => {
             onChange={(e) => setPlatform(e.target.value)}
             className="w-full px-4 py-2 border border-secondary-300 dark:border-secondary-600 rounded-lg bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-smooth"
           >
-            <option value="twitter">Twitter (280 characters)</option>
-            <option value="facebook">Facebook</option>
-            <option value="instagram">Instagram</option>
-            <option value="linkedin">LinkedIn</option>
+            {PLATFORM_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label} ({opt.limit} characters)
+              </option>
+            ))}
           </select>
           <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-1">
             Format will be optimized for the selected platform

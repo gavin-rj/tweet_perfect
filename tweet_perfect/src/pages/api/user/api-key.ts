@@ -36,9 +36,9 @@ export default async function handler(
       // Try a simple API call to validate the key
       await openai.listModels()
     } catch (error: any) {
+      console.error(`[API Key] Validation failed for user ${userId}:`, error.message)
       return res.status(400).json({
         error: 'Invalid OpenAI API key',
-        details: error.message,
       })
     }
 

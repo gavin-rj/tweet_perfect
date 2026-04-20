@@ -3,8 +3,22 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
-import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
+
+/**
+ * Validate callback URL is safe (same-origin only)
+ */
+function isValidCallbackUrl(url) {
+  if (!url) return true // No callback URL is valid (defaults to home)
+  if (url.startsWith('/')) return true // Relative URLs are safe
+  try {
+    const parsed = new URL(url)
+    const siteUrl = new URL(process.env.NEXT_PUBLIC_NEXTAUTH_URL || 'http://localhost:3000')
+    return parsed.origin === siteUrl.origin
+  } catch {
+    return false // Invalid URL format
+  }
+}
 
 export default function SignIn() {
   const router = useRouter()
@@ -13,7 +27,11 @@ export default function SignIn() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const callbackUrl = router.query.callbackUrl || '/'
+  // Validate and sanitize callback URL
+  let callbackUrl = '/'
+  if (router.query.callbackUrl && isValidCallbackUrl(router.query.callbackUrl)) {
+    callbackUrl = router.query.callbackUrl
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -25,15 +43,16 @@ export default function SignIn() {
         username,
         password,
         redirect: false,
-        callbackUrl: callbackUrl || '/',
+        callbackUrl,
       })
 
       if (result?.error) {
-        setError('Invalid username or password. Try admin / 1234')
+        setError('Invalid username or password')
       } else if (result?.ok) {
-        router.push(callbackUrl || '/')
+        router.push(callbackUrl)
       }
     } catch (err) {
+      console.error('[SignIn] Error:', err.message)
       setError('An error occurred. Please try again.')
     } finally {
       setLoading(false)

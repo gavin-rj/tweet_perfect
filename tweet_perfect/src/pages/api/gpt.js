@@ -2,6 +2,10 @@ import { OpenAIApi, Configuration } from 'openai'
 import { requireAuth } from '@/lib/auth'
 import { getUserData, saveTweet } from '@/lib/db-helpers'
 
+// Constants
+const MAX_PROMPT_LENGTH = 5000
+const MIN_PROMPT_LENGTH = 1
+
 const fetchGPTResponse = async (prompt, apiKey) => {
   const configuration = new Configuration({
     organization: process.env.OPENAI_ORGANISATION,
@@ -38,6 +42,17 @@ export default async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' })
     }
 
+    // Validate prompt length
+    const promptLength = String(prompt).trim().length
+    if (promptLength < MIN_PROMPT_LENGTH) {
+      return res.status(400).json({ error: 'Prompt cannot be empty' })
+    }
+    if (promptLength > MAX_PROMPT_LENGTH) {
+      return res.status(400).json({
+        error: `Prompt exceeds maximum length of ${MAX_PROMPT_LENGTH} characters (current: ${promptLength})`,
+      })
+    }
+
     try {
       // Get user data to check for custom API key
       const user = await getUserData(userId)
@@ -66,7 +81,7 @@ export default async (req, res) => {
 
       res.status(200).json({ response: gptResponse })
     } catch (error) {
-      console.error('Error fetching GPT response:', error)
+      console.error(`[GPT API] Error for user ${userId}:`, error.message)
 
       if (error.response?.status === 401) {
         return res.status(401).json({ error: 'Invalid API key' })

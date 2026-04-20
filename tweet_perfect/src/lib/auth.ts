@@ -5,22 +5,6 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import prisma from './prisma'
 
 /**
- * Hardcoded admin user for development
- * In production, query from database and use proper password hashing (bcrypt)
- */
-const DEMO_USER = {
-  id: '1',
-  email: 'admin@tweetperfect.local',
-  name: 'Admin User',
-  role: 'admin',
-}
-
-const DEMO_CREDENTIALS = {
-  username: 'admin',
-  password: '1234',
-}
-
-/**
  * NextAuth configuration options
  */
 export const authOptions: NextAuthOptions = {
@@ -44,17 +28,23 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // DEVELOPMENT ONLY - Hardcoded user
-        // In production, validate against database with hashed passwords
+        // Validate against environment variables
+        const adminUsername = process.env.NEXTAUTH_ADMIN_USERNAME
+        const adminPassword = process.env.NEXTAUTH_ADMIN_PASSWORD
+
+        if (!adminUsername || !adminPassword) {
+          console.error('[Auth] Admin credentials not configured')
+          return null
+        }
+
         if (
-          credentials.username === DEMO_CREDENTIALS.username &&
-          credentials.password === DEMO_CREDENTIALS.password
+          credentials.username === adminUsername &&
+          credentials.password === adminPassword
         ) {
           return {
-            id: DEMO_USER.id,
-            email: DEMO_USER.email,
-            name: DEMO_USER.name,
-            image: null,
+            id: '1',
+            email: 'admin@tweetperfect.local',
+            name: 'Admin User',
           }
         }
 
@@ -82,7 +72,7 @@ export const authOptions: NextAuthOptions = {
       // Persist user ID to token when signing in
       if (user) {
         token.id = user.id
-        token.role = (user as any).role || 'user'
+        token.role = 'admin'
       }
       return token
     },
@@ -125,4 +115,5 @@ export async function requireAuth(
 
   return session
 }
+
 

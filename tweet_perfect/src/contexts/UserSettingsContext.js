@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react'
+import { createContext, useState, useEffect, useMemo } from 'react'
 import { useSession } from 'next-auth/react'
 
 const UserSettingsContext = createContext({
@@ -21,14 +21,28 @@ export function UserSettingsProvider({ children }) {
 
   // Load user settings on mount
   useEffect(() => {
-    if (session?.user?.id) {
-      loadSettings()
-    } else {
-      setLoading(false)
+    const loadSettings = async () => {
+      try {
+        if (session?.user?.id) {
+          const res = await fetch('/api/user/settings')
+          if (res.ok) {
+            const data = await res.json()
+            setApiKey(data.apiKey || '')
+            setTheme(data.theme || 'light')
+            setDefaultPlatform(data.defaultPlatform || 'twitter')
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load settings:', error)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    loadSettings()
   }, [session?.user?.id])
 
-  // Update DOM theme
+  // Update DOM theme - separated to prevent race conditions
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const html = document.documentElement
@@ -39,22 +53,6 @@ export function UserSettingsProvider({ children }) {
       }
     }
   }, [theme])
-
-  const loadSettings = async () => {
-    try {
-      const res = await fetch('/api/user/settings')
-      if (res.ok) {
-        const data = await res.json()
-        setApiKey(data.apiKey || '')
-        setTheme(data.theme || 'light')
-        setDefaultPlatform(data.defaultPlatform || 'twitter')
-      }
-    } catch (error) {
-      console.error('Failed to load settings:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const saveSettings = async (settings) => {
     try {
@@ -80,19 +78,23 @@ export function UserSettingsProvider({ children }) {
     }
   }
 
+  // Memoize context value to prevent unnecessary re-renders
+  const value = useMemo(
+    () => ({
+      apiKey,
+      setApiKey,
+      theme,
+      setTheme,
+      defaultPlatform,
+      setDefaultPlatform,
+      loading,
+      saveSettings,
+    }),
+    [apiKey, theme, defaultPlatform, loading]
+  )
+
   return (
-    <UserSettingsContext.Provider
-      value={{
-        apiKey,
-        setApiKey,
-        theme,
-        setTheme,
-        defaultPlatform,
-        setDefaultPlatform,
-        loading,
-        saveSettings,
-      }}
-    >
+    <UserSettingsContext.Provider value={value}>
       {children}
     </UserSettingsContext.Provider>
   )

@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
 import Head from 'next/head'
 import { Analytics } from '@vercel/analytics/react'
 import Header from '../components/Header'
 import GptResponseContext from '../contexts/GptResponseContext'
 import { UserSettingsProvider } from '../contexts/UserSettingsContext'
 import { SessionProvider } from "next-auth/react"
+import { useState } from 'react'
 
 // Styles
 import '../styles/globals.scss'

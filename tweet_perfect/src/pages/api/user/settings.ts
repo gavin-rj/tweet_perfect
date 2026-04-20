@@ -3,6 +3,12 @@ import { getUserData, updateUserPreferences } from '@/lib/db-helpers'
 import prisma from '@/lib/prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
+interface SettingsUpdateRequest {
+  apiKey?: string
+  theme?: 'light' | 'dark'
+  defaultPlatform?: 'twitter' | 'facebook' | 'instagram' | 'linkedin'
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -37,7 +43,7 @@ export default async function handler(
     }
   } else if (req.method === 'POST') {
     try {
-      const { apiKey, theme, defaultPlatform } = req.body
+      const { apiKey, theme, defaultPlatform } = req.body as SettingsUpdateRequest
 
       // Validate inputs
       if (theme && !['light', 'dark'].includes(theme)) {
@@ -49,15 +55,15 @@ export default async function handler(
       }
 
       // Build update data
-      const updateData: any = {}
-      if (theme) updateData.theme = theme
-      if (defaultPlatform) updateData.defaultPlatform = defaultPlatform
-      if (apiKey !== undefined) updateData.apiKey = apiKey
+      const updateData: Partial<typeof prisma.user.update> = {} as Partial<typeof prisma.user.update>
+      if (theme) (updateData as Record<string, unknown>).theme = theme
+      if (defaultPlatform) (updateData as Record<string, unknown>).defaultPlatform = defaultPlatform
+      if (apiKey !== undefined) (updateData as Record<string, unknown>).apiKey = apiKey
 
       // Update user
       const updatedUser = await prisma.user.update({
         where: { id: userId },
-        data: updateData,
+        data: updateData as any,
       })
 
       // Update preferences if theme is being changed

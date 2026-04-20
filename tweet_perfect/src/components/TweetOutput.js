@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react'
-import GptResponseContext from '../contexts/GptResponseContext'
+import GptResponseContext from '@/contexts/GptResponseContext'
+import { PLATFORM_LIMITS, getPlatformLimit } from '@/constants/platforms'
 import Card from './ui/Card'
 import Button from './ui/Button'
 
